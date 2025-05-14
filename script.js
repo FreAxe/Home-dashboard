@@ -254,5 +254,21 @@ function applySavedTheme() {
   }
 }
 
+function removeHiddenDevices() {
+  let hiddenCount = 0;
+
+  for (const name in devices) {
+    if (!order.includes(name)) {
+      delete devices[name];
+      hiddenCount++;
+    }
+  }
+
+  saveDevices();
+  renderDevices();
+
+  alert(`🧼 Rensade ${hiddenCount} dold(a) enhet(er).`);
+}
+
 applySavedTheme();
 renderDevices();

@@ -1,3 +1,4 @@
+console.log("script.js är laddad");
 let devices = JSON.parse(localStorage.getItem("devices")) || {};
 let order = JSON.parse(localStorage.getItem("deviceOrder")) || [];
 

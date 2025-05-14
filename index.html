@@ -3,8 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Home Automation Dashboard</title>
+  <title>Hemautomationspanel</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    .device {
+      cursor: move;
+    }
+    .drag-over {
+      outline: 2px dashed var(--primary);
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+  </style>
 </head>
 <body>
   <h1>Hemautomationspanel</h1>
@@ -38,6 +47,8 @@
           <option value="dim">Dimringsbar</option>
         </select>
       </div>
+
+      <p id="popup-error" style="color: red; margin-top: 0.5rem;"></p>
 
       <button onclick="addDevice()">Spara</button>
       <button onclick="closePopup()" class="danger">Avbryt</button>

@@ -28,15 +28,23 @@ function renderDevices() {
       div.innerHTML = `
         <h2>${name}</h2>
         <p><strong>Temperatur:</strong> <span class="status">0.0 °C</span></p>
-        <button onclick="removeDevice('${name}')" style="background:#ef4444; margin-top:0.5rem;">Ta bort</button>
+        <button onclick="removeDevice('${name}')" class="danger">Ta bort</button>
       `;
     } else if (dev.type === "lamp") {
-      let controlButton = dev.mode === "dim" ? "<input type='range' min='0' max='100' value='50' onchange='setDimValue(\"" + name + "\", this.value)'/>" : `<button onclick="toggle('${name}')">Tänd/Släck</button>`;
+      let controlHTML = "";
+      if (dev.mode === "dim") {
+        controlHTML = `
+          <input type='range' min='0' max='100' value='${dev.dim || 50}' onchange='setDimValue("${name}", this.value)'/>
+          <div class="dim-value" id="dim-${name}">${dev.dim || 50}%</div>
+        `;
+      } else {
+        controlHTML = `<button onclick="toggle('${name}')">Tänd/Släck</button>`;
+      }
       div.innerHTML = `
         <h2>${name}</h2>
         <p>Status: <span class="status">${dev.status ? "På" : "Av"}</span></p>
-        ${controlButton}<br>
-        <button onclick="removeDevice('${name}')" style="background:#ef4444; margin-top:0.5rem;">Ta bort</button>
+        ${controlHTML}<br>
+        <button onclick="removeDevice('${name}')" class="danger">Ta bort</button>
       `;
     }
     container.appendChild(div);
@@ -70,6 +78,9 @@ function addDevice() {
   if (type === "lamp") {
     newDevice.status = false;
     newDevice.mode = lampMode.value;
+    if (lampMode.value === "dim") {
+      newDevice.dim = 50;
+    }
   }
 
   devices[name] = newDevice;
@@ -80,7 +91,10 @@ function addDevice() {
 }
 
 function setDimValue(name, value) {
-  console.log(`Dimvärde för ${name}: ${value}%`);
+  devices[name].dim = parseInt(value);
+  const label = document.getElementById(`dim-${name}`);
+  if (label) label.textContent = `${value}%`;
+  saveDevices();
 }
 
 function removeDevice(name) {
@@ -93,4 +107,17 @@ function saveDevices() {
   localStorage.setItem("devices", JSON.stringify(devices));
 }
 
+function toggleTheme() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+}
+
+function applySavedTheme() {
+  const theme = localStorage.getItem("theme");
+  if (theme === "dark") {
+    document.body.classList.add("dark");
+  }
+}
+
+applySavedTheme();
 renderDevices();

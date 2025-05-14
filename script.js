@@ -153,7 +153,7 @@ function renderDevices() {
       if (dev.mode === "dim") {
         controlHTML = `
           <div class="dim-value" id="dim-${name}">${dev.dim || 50}%</div>
-          <input type="range" min="0" max="100" value="${dev.dim || 50}"
+          <input type="range" id="slider-${name}" min="0" max="100" value="${dev.dim || 50}"
             oninput="setDimValue('${name}', this.value)" />
           <button onclick="toggle('${name}')" class="toggle-btn">${dev.status ? "Släck" : "Tänd"}</button>
         `;
@@ -168,6 +168,13 @@ function renderDevices() {
         <br />
         <button onclick="removeDevice('${name}')" class="danger">Ta bort</button>
       `;
+
+      // Stoppa drag på slider
+      const slider = div.querySelector(`#slider-${name}`);
+      if (slider) {
+        slider.addEventListener("mousedown", e => e.stopPropagation());
+        slider.addEventListener("touchstart", e => e.stopPropagation());
+      }
     }
 
     container.appendChild(div);

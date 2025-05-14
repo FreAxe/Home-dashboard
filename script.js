@@ -6,6 +6,9 @@ function updateStatusUI(name) {
   const device = devices[name];
   const el = document.querySelector(`#device-${name.toLowerCase()} .status`);
   const icon = document.querySelector(`#lamp-icon-${name}`);
+  const dimValue = document.getElementById(`dim-${name}`);
+  const button = document.querySelector(`#device-${name.toLowerCase()} .toggle-button`);
+
   if (el && device.type === "lamp") {
     if (device.mode === "dim") {
       const level = device.status ? device.dim || 0 : 0;
@@ -15,6 +18,8 @@ function updateStatusUI(name) {
         icon.classList.add("lamp-glow");
         icon.style.textShadow = `0 0 ${Math.round(level / 10)}px rgba(255, 223, 70, ${Math.min(level / 100, 1)})`;
       }
+      if (dimValue) dimValue.textContent = `${level}%`;
+      if (button) button.textContent = level > 0 ? "Släck" : "Tänd";
     } else {
       el.innerText = device.status ? "På" : "Av";
       if (icon) {
@@ -22,6 +27,7 @@ function updateStatusUI(name) {
         icon.classList.remove("lamp-glow");
         icon.style.textShadow = "none";
       }
+      if (button) button.textContent = device.status ? "Släck" : "Tänd";
     }
   }
 }
@@ -55,12 +61,12 @@ function renderDevices() {
       if (dev.mode === "dim") {
         const value = dev.status ? dev.dim || 50 : 0;
         controlHTML = `
-          <input type='range' min='0' max='100' value='${value}' oninput='setDimValue("${name}", this.value)'/>
           <div class="dim-value" id="dim-${name}">${value}%</div>
-          <button onclick='toggle("${name}")'>${dev.status ? "Släck" : "Tänd"}</button>
+          <input type='range' min='0' max='100' value='${value}' oninput='setDimValue("${name}", this.value)'/>
+          <button class="toggle-button" onclick='toggle("${name}")'>${value > 0 ? "Släck" : "Tänd"}</button>
         `;
       } else {
-        controlHTML = `<button onclick="toggle('${name}')">Tänd/Släck</button>`;
+        controlHTML = `<button class="toggle-button" onclick="toggle('${name}')">${dev.status ? "Släck" : "Tänd"}</button>`;
       }
       div.innerHTML = `
         <h2>${name}</h2>

@@ -8,7 +8,7 @@ function updateStatusUI(name) {
   const icon = document.querySelector(`#lamp-icon-${name}`);
   if (el && device.type === "lamp") {
     if (device.mode === "dim") {
-      const level = device.dim || 0;
+      const level = device.status ? device.dim || 0 : 0;
       el.innerText = level > 0 ? "På" : "Av";
       if (icon) {
         icon.classList.toggle("lamp-on", level > 0);
@@ -53,9 +53,11 @@ function renderDevices() {
     } else if (dev.type === "lamp") {
       let controlHTML = "";
       if (dev.mode === "dim") {
+        const value = dev.status ? dev.dim || 50 : 0;
         controlHTML = `
-          <input type='range' min='0' max='100' value='${dev.dim || 50}' oninput='setDimValue("${name}", this.value)'/>
-          <div class="dim-value" id="dim-${name}">${dev.dim || 50}%</div>
+          <input type='range' min='0' max='100' value='${value}' oninput='setDimValue("${name}", this.value)'/>
+          <div class="dim-value" id="dim-${name}">${value}%</div>
+          <button onclick='toggle("${name}")'>${dev.status ? "Släck" : "Tänd"}</button>
         `;
       } else {
         controlHTML = `<button onclick="toggle('${name}')">Tänd/Släck</button>`;
@@ -115,11 +117,18 @@ function addDevice() {
 }
 
 function setDimValue(name, value) {
-  devices[name].dim = parseInt(value);
+  const device = devices[name];
+  device.dim = parseInt(value);
   const label = document.getElementById(`dim-${name}`);
   if (label) label.textContent = `${value}%`;
-  updateStatusUI(name);
-  saveDevices();
+
+  if (device.type === "lamp" && device.mode === "dim") {
+    if (!device.status && parseInt(value) > 0) {
+      device.status = true;
+    }
+    updateStatusUI(name);
+    saveDevices();
+  }
 }
 
 function removeDevice(name) {

@@ -1,95 +1,147 @@
-// Fil: script.js
-
 let devices = JSON.parse(localStorage.getItem("devices")) || {};
+let order = JSON.parse(localStorage.getItem("deviceOrder")) || [];
+
+function saveDevices() {
+  localStorage.setItem("devices", JSON.stringify(devices));
+  localStorage.setItem("deviceOrder", JSON.stringify(order));
+}
 
 function updateStatusUI(name) {
   const device = devices[name];
   const el = document.querySelector(`#device-${name.toLowerCase()} .status`);
-  const icon = document.querySelector(`#lamp-icon-${name}`);
-  const dimValue = document.getElementById(`dim-${name}`);
-  const button = document.querySelector(`#device-${name.toLowerCase()} .toggle-button`);
-  const range = document.querySelector(`#device-${name.toLowerCase()} input[type=range]`);
+  if (!el) return;
 
-  if (el && device.type === "lamp") {
-    if (device.mode === "dim") {
-      const level = device.status ? device.dim || 0 : 0;
-      el.innerText = level > 0 ? "På" : "Av";
-      if (icon) {
-        icon.classList.toggle("lamp-on", level > 0);
+  if (device.type === "lamp") {
+    const isOn = device.status;
+    el.innerText = isOn ? "På" : "Av";
+
+    const btn = document.querySelector(`#device-${name.toLowerCase()} .toggle-btn`);
+    if (btn) btn.innerText = isOn ? "Släck" : "Tänd";
+
+    const icon = document.querySelector(`#lamp-icon-${name}`);
+    if (icon) {
+      if (isOn && device.mode === "dim") {
+        icon.classList.add("lamp-on");
         icon.classList.add("lamp-glow");
-        icon.style.textShadow = `0 0 ${Math.round(level / 10)}px rgba(255, 223, 70, ${Math.min(level / 100, 1)})`;
-      }
-      if (dimValue) dimValue.textContent = `${level}%`;
-      if (button) button.textContent = level > 0 ? "Släck" : "Tänd";
-      if (range) {
-        range.value = level;
-        const hue = Math.round((level / 100) * 60);
-        range.style.background = `linear-gradient(to right, hsl(${hue}, 100%, 50%) ${level}%, #ccc ${level}%)`;
-      }
-    } else {
-      el.innerText = device.status ? "På" : "Av";
-      if (icon) {
-        icon.classList.toggle("lamp-on", device.status);
+      } else {
+        icon.classList.remove("lamp-on");
         icon.classList.remove("lamp-glow");
-        icon.style.textShadow = "none";
+        icon.style.textShadow = "";
       }
-      if (button) button.textContent = device.status ? "Släck" : "Tänd";
     }
   }
 }
 
-function animateDim(name, from, to, duration = 500) {
+function setDimValue(name, value, updateSlider = true) {
   const device = devices[name];
-  const range = document.querySelector(`#device-${name.toLowerCase()} input[type=range]`);
-  const label = document.getElementById(`dim-${name}`);
-  const start = performance.now();
+  value = parseInt(value);
 
-  function animate(now) {
-    const progress = Math.min((now - start) / duration, 1);
-    const current = Math.round(from + (to - from) * progress);
-    if (range) {
-      range.value = current;
-      const hue = Math.round((current / 100) * 60);
-      range.style.background = `linear-gradient(to right, hsl(${hue}, 100%, 50%) ${current}%, #ccc ${current}%)`;
+  if (device) {
+    device.dim = value;
+
+    const label = document.getElementById(`dim-${name}`);
+    if (label) label.textContent = `${value}%`;
+
+    const icon = document.querySelector(`#lamp-icon-${name}`);
+    if (icon) {
+      if (value > 0) {
+        icon.classList.add("lamp-on");
+        icon.classList.add("lamp-glow");
+        icon.style.textShadow = `0 0 ${value / 10}px rgba(255, 223, 70, ${value / 100})`;
+      } else {
+        icon.classList.remove("lamp-on");
+        icon.classList.remove("lamp-glow");
+        icon.style.textShadow = "";
+      }
     }
-    if (label) label.textContent = `${current}%`;
-    device.dim = current;
-    updateStatusUI(name);
-    if (progress < 1) {
-      requestAnimationFrame(animate);
+
+    if (value > 0) {
+      device.status = true;
     } else {
-      saveDevices();
+      device.status = false;
     }
+
+    updateStatusUI(name);
+    saveDevices();
   }
 
+  if (updateSlider) {
+    const slider = document.querySelector(`#device-${name.toLowerCase()} input[type=range]`);
+    if (slider) slider.value = value;
+  }
+}
+
+function animateDim(name, from, to, duration = 500) {
+  const start = performance.now();
+  function animate(time) {
+    const elapsed = time - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const current = Math.round(from + (to - from) * progress);
+    setDimValue(name, current, true);
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    }
+  }
   requestAnimationFrame(animate);
 }
 
 function toggle(name) {
   const device = devices[name];
-  if (device.type === "lamp") {
-    if (device.mode === "dim") {
-      const prevDim = device.dim || 50;
-      if (device.status) {
-        animateDim(name, prevDim, 0);
-      } else {
-        animateDim(name, 0, prevDim);
-      }
-    }
-    device.status = !device.status;
-    updateStatusUI(name);
-    saveDevices();
+  if (!device || device.type !== "lamp" || device.mode !== "dim") return;
+
+  if (device.status) {
+    device.lastDim = device.dim;
+    animateDim(name, device.dim, 0);
+  } else {
+    animateDim(name, 0, device.lastDim || 50);
   }
+}
+
+function removeDevice(name) {
+  delete devices[name];
+  order = order.filter(n => n !== name);
+  saveDevices();
+  renderDevices();
 }
 
 function renderDevices() {
   const container = document.getElementById("devices-container");
   container.innerHTML = "";
-  Object.keys(devices).forEach(name => {
+
+  const sorted = order.filter(name => devices[name]);
+
+  sorted.forEach(name => {
     const dev = devices[name];
     const div = document.createElement("div");
     div.className = "device";
     div.id = `device-${name.toLowerCase()}`;
+    div.setAttribute("draggable", true);
+
+    div.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("text/plain", name);
+    });
+
+    div.addEventListener("dragover", e => {
+      e.preventDefault();
+      div.classList.add("drag-over");
+    });
+
+    div.addEventListener("dragleave", () => {
+      div.classList.remove("drag-over");
+    });
+
+    div.addEventListener("drop", e => {
+      e.preventDefault();
+      const draggedName = e.dataTransfer.getData("text/plain");
+      const fromIndex = order.indexOf(draggedName);
+      const toIndex = order.indexOf(name);
+      if (fromIndex > -1 && toIndex > -1 && fromIndex !== toIndex) {
+        order.splice(fromIndex, 1);
+        order.splice(toIndex, 0, draggedName);
+        saveDevices();
+        renderDevices();
+      }
+    });
 
     if (dev.type === "sensor") {
       div.innerHTML = `
@@ -98,34 +150,36 @@ function renderDevices() {
         <button onclick="removeDevice('${name}')" class="danger">Ta bort</button>
       `;
     } else if (dev.type === "lamp") {
+      const icon = `<span id="lamp-icon-${name}" class="lamp-icon">💡</span>`;
       let controlHTML = "";
       if (dev.mode === "dim") {
-        const value = dev.status ? dev.dim || 50 : 0;
         controlHTML = `
-          <div class="dim-value" id="dim-${name}">${value}%</div>
-          <input type='range' min='0' max='100' value='${value}' oninput='setDimValue("${name}", this.value)'/>
-          <button class="toggle-button" onclick='toggle("${name}")'>${value > 0 ? "Släck" : "Tänd"}</button>
+          <div class="dim-value" id="dim-${name}">${dev.dim || 50}%</div>
+          <input type="range" min="0" max="100" value="${dev.dim || 50}"
+            oninput="setDimValue('${name}', this.value)" />
+          <button onclick="toggle('${name}')" class="toggle-btn">${dev.status ? "Släck" : "Tänd"}</button>
         `;
       } else {
-        controlHTML = `<button class="toggle-button" onclick="toggle('${name}')">${dev.status ? "Släck" : "Tänd"}</button>`;
+        controlHTML = `<button onclick="toggle('${name}')" class="toggle-btn">${dev.status ? "Släck" : "Tänd"}</button>`;
       }
+
       div.innerHTML = `
         <h2>${name}</h2>
-        <p>
-          Status: <span class="status">${dev.status ? "På" : "Av"}</span>
-          <span id="lamp-icon-${name}" class="lamp-icon">💡</span>
-        </p>
-        ${controlHTML}<br>
+        <p>Status: <span class="status">${dev.status ? "På" : "Av"}</span> ${icon}</p>
+        ${controlHTML}
+        <br />
         <button onclick="removeDevice('${name}')" class="danger">Ta bort</button>
       `;
     }
+
     container.appendChild(div);
     updateStatusUI(name);
   });
 }
 
 function showAddForm() {
-  document.getElementById("popup").style.display = "block";
+  document.getElementById("popup").style.display = "flex";
+  document.getElementById("popup").classList.toggle("dark", document.body.classList.contains("dark"));
   updateFormOptions();
 }
 
@@ -153,64 +207,27 @@ function addDevice() {
     newDevice.mode = lampMode.value;
     if (lampMode.value === "dim") {
       newDevice.dim = 50;
+      newDevice.lastDim = 50;
     }
   }
 
   devices[name] = newDevice;
+  order.push(name);
   saveDevices();
   renderDevices();
   nameInput.value = "";
   closePopup();
 }
 
-function setDimValue(name, value) {
-  const device = devices[name];
-  device.dim = parseInt(value);
-  const label = document.getElementById(`dim-${name}`);
-  const range = document.querySelector(`#device-${name.toLowerCase()} input[type=range]`);
-  if (label) label.textContent = `${value}%`;
-  if (range) {
-    const hue = Math.round((value / 100) * 60);
-    range.style.background = `linear-gradient(to right, hsl(${hue}, 100%, 50%) ${value}%, #ccc ${value}%)`;
-  }
-
-  if (device.type === "lamp" && device.mode === "dim") {
-    if (!device.status && parseInt(value) > 0) {
-      device.status = true;
-    }
-    updateStatusUI(name);
-    saveDevices();
-  }
-}
-
-function removeDevice(name) {
-  delete devices[name];
-  saveDevices();
-  renderDevices();
-}
-
-function saveDevices() {
-  localStorage.setItem("devices", JSON.stringify(devices));
-}
-
 function toggleTheme() {
   document.body.classList.toggle("dark");
   localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-
-  const popup = document.getElementById("popup");
-  if (document.body.classList.contains("dark")) {
-    popup.classList.add("dark");
-  } else {
-    popup.classList.remove("dark");
-  }
 }
 
 function applySavedTheme() {
   const theme = localStorage.getItem("theme");
   if (theme === "dark") {
     document.body.classList.add("dark");
-    const popup = document.getElementById("popup");
-    popup.classList.add("dark");
   }
 }
 

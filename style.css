@@ -1,1 +1,64 @@
+:root {
+  --bg-color: #f9fafb;
+  --card-bg: #ffffff;
+  --primary: #3b82f6;
+  --text-color: #111827;
+  --muted-text: #6b7280;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  margin: 0;
+  padding: 2rem;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: var(--primary);
+}
+
+.device {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  max-width: 360px;
+  margin: 1rem auto;
+  padding: 1.5rem;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+.device:hover {
+  transform: translateY(-3px);
+}
+
+.device h2 {
+  margin-top: 0;
+  font-size: 1.2rem;
+}
+
+.status {
+  font-weight: bold;
+  color: var(--muted-text);
+}
+
+button {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.2rem;
+  margin-top: 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #2563eb;
+}
 

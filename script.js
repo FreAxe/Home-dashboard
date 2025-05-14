@@ -22,8 +22,11 @@ function updateStatusUI(name) {
 
     const icon = document.querySelector(`#lamp-icon-${name}`);
     if (icon) {
-      if (isOn && device.mode === "dim") {
+      if (isOn) {
         icon.classList.add("lamp-on", "lamp-glow");
+        icon.style.textShadow = device.mode === "dim"
+          ? `0 0 ${device.dim / 10}px rgba(255, 223, 70, ${device.dim / 100})`
+          : `0 0 5px rgba(255, 223, 70, 0.8)`;
       } else {
         icon.classList.remove("lamp-on", "lamp-glow");
         icon.style.textShadow = "";

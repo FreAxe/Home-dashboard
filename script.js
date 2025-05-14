@@ -53,12 +53,7 @@ function setDimValue(name, value, updateSlider = true) {
       }
     }
 
-    if (value > 0) {
-      device.status = true;
-    } else {
-      device.status = false;
-    }
-
+    device.status = value > 0;
     updateStatusUI(name);
     saveDevices();
   }
@@ -85,13 +80,19 @@ function animateDim(name, from, to, duration = 500) {
 
 function toggle(name) {
   const device = devices[name];
-  if (!device || device.type !== "lamp" || device.mode !== "dim") return;
+  if (!device || device.type !== "lamp") return;
 
-  if (device.status) {
-    device.lastDim = device.dim;
-    animateDim(name, device.dim, 0);
-  } else {
-    animateDim(name, 0, device.lastDim || 50);
+  if (device.mode === "dim") {
+    if (device.status) {
+      device.lastDim = device.dim;
+      animateDim(name, device.dim, 0);
+    } else {
+      animateDim(name, 0, device.lastDim || 50);
+    }
+  } else if (device.mode === "toggle") {
+    device.status = !device.status;
+    updateStatusUI(name);
+    saveDevices();
   }
 }
 
@@ -150,6 +151,7 @@ function renderDevices() {
     } else if (dev.type === "lamp") {
       const icon = `<span id="lamp-icon-${name}" class="lamp-icon">💡</span>`;
       let controlHTML = "";
+
       if (dev.mode === "dim") {
         controlHTML = `
           <div class="dim-value" id="dim-${name}">${dev.dim || 50}%</div>
@@ -157,8 +159,10 @@ function renderDevices() {
             oninput="setDimValue('${name}', this.value)" />
           <button onclick="toggle('${name}')" class="toggle-btn">${dev.status ? "Släck" : "Tänd"}</button>
         `;
-      } else {
-        controlHTML = `<button onclick="toggle('${name}')" class="toggle-btn">${dev.status ? "Släck" : "Tänd"}</button>`;
+      } else if (dev.mode === "toggle") {
+        controlHTML = `
+          <button onclick="toggle('${name}')" class="toggle-btn">${dev.status ? "Släck" : "Tänd"}</button>
+        `;
       }
 
       div.innerHTML = `
@@ -169,7 +173,6 @@ function renderDevices() {
         <button onclick="removeDevice('${name}')" class="danger">Ta bort</button>
       `;
 
-      // 🛠 Förhindra att drag triggas från slidern
       const slider = div.querySelector(`#slider-${name}`);
       if (slider) {
         slider.addEventListener("mousedown", () => div.setAttribute("draggable", false));

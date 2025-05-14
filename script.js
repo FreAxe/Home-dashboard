@@ -1,47 +1,98 @@
-<!-- script.js -->
-<script>
-const devices = {
-  "Vardagsrum": { status: false },
-  "Kök": { status: false }
-};
+ <script>
+    let devices = JSON.parse(localStorage.getItem("devices")) || {};
 
-function updateStatusUI(name) {
-  const device = devices[name];
-  const el = document.querySelector(`#device-${name.toLowerCase()} .status`);
-  el.innerText = device.status ? "På" : "Av";
-}
+    function updateStatusUI(name) {
+      const device = devices[name];
+      const el = document.querySelector(`#device-${name.toLowerCase()} .status`);
+      if (el && device.type === "lamp") el.innerText = device.status ? "På" : "Av";
+    }
 
-function toggle(name) {
-  devices[name].status = !devices[name].status;
-  updateStatusUI(name);
-}
+    function toggle(name) {
+      const device = devices[name];
+      if (device.type === "lamp") {
+        device.status = !device.status;
+        updateStatusUI(name);
+        saveDevices();
+      }
+    }
 
-Object.keys(devices).forEach(updateStatusUI);
+    function renderDevices() {
+      const container = document.getElementById("devices-container");
+      container.innerHTML = "";
+      Object.keys(devices).forEach(name => {
+        const dev = devices[name];
+        const div = document.createElement("div");
+        div.className = "device";
+        div.id = `device-${name.toLowerCase()}`;
 
-function showAddForm() {
-  document.getElementById("add-form").style.display = "block";
-}
+        if (dev.type === "sensor") {
+          div.innerHTML = `
+            <h2>${name}</h2>
+            <p><strong>Temperatur:</strong> <span class="status">0.0 °C</span></p>
+            <button onclick="removeDevice('${name}')" style="background:#ef4444; margin-top:0.5rem;">Ta bort</button>
+          `;
+        } else if (dev.type === "lamp") {
+          let controlButton = dev.mode === "dim" ? "<input type='range' min='0' max='100' value='50' onchange='setDimValue(\"" + name + "\", this.value)'/>" : `<button onclick="toggle('${name}')">Tänd/Släck</button>`;
+          div.innerHTML = `
+            <h2>${name}</h2>
+            <p>Status: <span class="status">${dev.status ? "På" : "Av"}</span></p>
+            ${controlButton}<br>
+            <button onclick="removeDevice('${name}')" style="background:#ef4444; margin-top:0.5rem;">Ta bort</button>
+          `;
+        }
+        container.appendChild(div);
+      });
+    }
 
-function addDevice() {
-  const nameInput = document.getElementById("new-device-name");
-  const name = nameInput.value.trim();
-  if (!name || devices[name]) return;
+    function showAddForm() {
+      document.getElementById("popup").style.display = "block";
+      updateFormOptions();
+    }
 
-  devices[name] = { status: false };
+    function updateFormOptions() {
+      const type = document.getElementById("device-type").value;
+      document.getElementById("lamp-options").style.display = type === "lamp" ? "block" : "none";
+    }
 
-  const container = document.getElementById("devices-container");
-  const div = document.createElement("div");
-  div.className = "device";
-  div.id = `device-${name.toLowerCase()}`;
-  div.innerHTML = `
-    <h2>${name}</h2>
-    <p>Status: <span class="status">Okänd</span></p>
-    <button onclick="toggle('${name}')">Tänd/Släck</button>
-  `;
-  container.appendChild(div);
-  updateStatusUI(name);
-  nameInput.value = "";
-  document.getElementById("add-form").style.display = "none";
-}
-</script>
+    function closePopup() {
+      document.getElementById("popup").style.display = "none";
+    }
 
+    function addDevice() {
+      const nameInput = document.getElementById("new-device-name");
+      const typeSelect = document.getElementById("device-type");
+      const lampMode = document.getElementById("lamp-mode");
+      const name = nameInput.value.trim();
+      const type = typeSelect.value;
+
+      if (!name || devices[name]) return;
+
+      const newDevice = { type };
+      if (type === "lamp") {
+        newDevice.status = false;
+        newDevice.mode = lampMode.value;
+      }
+
+      devices[name] = newDevice;
+      saveDevices();
+      renderDevices();
+      nameInput.value = "";
+      closePopup();
+    }
+
+    function setDimValue(name, value) {
+      console.log(`Dimvärde för ${name}: ${value}%`);
+    }
+
+    function removeDevice(name) {
+      delete devices[name];
+      saveDevices();
+      renderDevices();
+    }
+
+    function saveDevices() {
+      localStorage.setItem("devices", JSON.stringify(devices));
+    }
+
+    renderDevices();
+  </script>

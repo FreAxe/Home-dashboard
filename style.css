@@ -1,3 +1,5 @@
+<!-- style.css -->
+<style>
 :root {
   --bg-color: #f9fafb;
   --card-bg: #ffffff;
@@ -62,3 +64,16 @@ button:hover {
   background-color: #2563eb;
 }
 
+.add-device {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.add-device input {
+  padding: 0.5rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  margin-right: 0.5rem;
+}
+</style>

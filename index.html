@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <title>Hemautomation Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🏠 Hemautomation</h1>
+
+  <div class="device" id="device-vardagsrum">
+    <h2>Vardagsrum</h2>
+    <p>Status: <span class="status">Okänd</span></p>
+    <button onclick="toggle('Vardagsrum')">Tänd/Släck</button>
+  </div>
+
+  <div class="device" id="device-kok">
+    <h2>Kök</h2>
+    <p>Status: <span class="status">Okänd</span></p>
+    <button onclick="toggle('Kök')">Tänd/Släck</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

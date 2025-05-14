@@ -1,4 +1,5 @@
 console.log("script.js är laddad");
+
 let devices = JSON.parse(localStorage.getItem("devices")) || {};
 let order = JSON.parse(localStorage.getItem("deviceOrder")) || [];
 
@@ -22,11 +23,9 @@ function updateStatusUI(name) {
     const icon = document.querySelector(`#lamp-icon-${name}`);
     if (icon) {
       if (isOn && device.mode === "dim") {
-        icon.classList.add("lamp-on");
-        icon.classList.add("lamp-glow");
+        icon.classList.add("lamp-on", "lamp-glow");
       } else {
-        icon.classList.remove("lamp-on");
-        icon.classList.remove("lamp-glow");
+        icon.classList.remove("lamp-on", "lamp-glow");
         icon.style.textShadow = "";
       }
     }
@@ -46,12 +45,10 @@ function setDimValue(name, value, updateSlider = true) {
     const icon = document.querySelector(`#lamp-icon-${name}`);
     if (icon) {
       if (value > 0) {
-        icon.classList.add("lamp-on");
-        icon.classList.add("lamp-glow");
+        icon.classList.add("lamp-on", "lamp-glow");
         icon.style.textShadow = `0 0 ${value / 10}px rgba(255, 223, 70, ${value / 100})`;
       } else {
-        icon.classList.remove("lamp-on");
-        icon.classList.remove("lamp-glow");
+        icon.classList.remove("lamp-on", "lamp-glow");
         icon.style.textShadow = "";
       }
     }
@@ -180,6 +177,7 @@ function renderDevices() {
 
 function showAddForm() {
   document.getElementById("popup").style.display = "flex";
+  document.getElementById("popup-error").textContent = "";
   document.getElementById("popup").classList.toggle("dark", document.body.classList.contains("dark"));
   updateFormOptions();
 }
@@ -199,8 +197,17 @@ function addDevice() {
   const lampMode = document.getElementById("lamp-mode");
   const name = nameInput.value.trim();
   const type = typeSelect.value;
+  const error = document.getElementById("popup-error");
 
-  if (!name || devices[name]) return;
+  if (!name) {
+    error.textContent = "Du måste ange ett namn.";
+    return;
+  }
+
+  if (devices[name]) {
+    error.textContent = `Enheten "${name}" finns redan.`;
+    return;
+  }
 
   const newDevice = { type };
   if (type === "lamp") {

@@ -2,15 +2,12 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
-  <title>Hem Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home Automation Dashboard</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>🏠 Hem</h1>
-
-  <div class="toggle-theme">
-    <button onclick="toggleTheme()">🌓 Växla tema</button>
-  </div>
+  <h1>Hemautomationspanel</h1>
 
   <div id="devices-container"></div>
 
@@ -18,29 +15,32 @@
     <button onclick="showAddForm()">➕ Lägg till enhet</button>
   </div>
 
-  <!-- Popup-formulär -->
-  <div id="popup" class="popup" style="display: none;">
-    <div class="popup-content">
-      <h2>Ny enhet</h2>
+  <div class="toggle-theme">
+    <button onclick="toggleTheme()">🌓 Växla tema</button>
+  </div>
 
-      <label for="device-type">Typ:</label>
+  <div id="popup" class="popup" style="display: none">
+    <div class="popup-content">
+      <h2>Lägg till enhet</h2>
+      <label for="new-device-name">Namn</label>
+      <input type="text" id="new-device-name" placeholder="T.ex. Fönsterlampa" />
+
+      <label for="device-type">Typ</label>
       <select id="device-type" onchange="updateFormOptions()">
-        <option value="sensor">Givare</option>
         <option value="lamp">Lampa</option>
+        <option value="sensor">Givare</option>
       </select>
 
-      <div id="lamp-options" style="display: none;">
-        <label for="lamp-mode">Lampfunktion:</label>
+      <div id="lamp-options">
+        <label for="lamp-mode">Läge</label>
         <select id="lamp-mode">
-          <option value="onoff">Tänd/Släck</option>
-          <option value="dim">Dimmringsbar</option>
+          <option value="toggle">Tänd/Släck</option>
+          <option value="dim">Dimringsbar</option>
         </select>
       </div>
 
-      <input type="text" id="new-device-name" placeholder="Namn på enhet" />
-
       <button onclick="addDevice()">Spara</button>
-      <button onclick="closePopup()">Avbryt</button>
+      <button onclick="closePopup()" class="danger">Avbryt</button>
     </div>
   </div>
 

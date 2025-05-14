@@ -78,6 +78,27 @@ h1 {
   font-weight: 600;
 }
 
+.lamp-icon {
+  font-size: 1.2rem;
+  display: inline-block;
+  margin-left: 0.5rem;
+  transition: filter 0.2s ease, opacity 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
+  filter: brightness(0);
+  opacity: 0.3;
+  color: #ccc;
+}
+
+.lamp-on {
+  filter: brightness(1);
+  opacity: 1;
+  color: #facc15;
+}
+
+.lamp-glow {
+  text-shadow: 0 0 0 rgba(255, 223, 70, 0);
+  transition: text-shadow 0.2s ease;
+}
+
 button {
   background-color: var(--primary);
   color: white;

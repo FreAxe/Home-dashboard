@@ -169,11 +169,13 @@ function renderDevices() {
         <button onclick="removeDevice('${name}')" class="danger">Ta bort</button>
       `;
 
-      // Stoppa drag på slider
+      // 🛠 Förhindra att drag triggas från slidern
       const slider = div.querySelector(`#slider-${name}`);
       if (slider) {
-        slider.addEventListener("mousedown", e => e.stopPropagation());
-        slider.addEventListener("touchstart", e => e.stopPropagation());
+        slider.addEventListener("mousedown", () => div.setAttribute("draggable", false));
+        slider.addEventListener("mouseup", () => div.setAttribute("draggable", true));
+        slider.addEventListener("touchstart", () => div.setAttribute("draggable", false));
+        slider.addEventListener("touchend", () => div.setAttribute("draggable", true));
       }
     }
 

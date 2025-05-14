@@ -1,3 +1,5 @@
+// Fil: script.js
+
 let devices = JSON.parse(localStorage.getItem("devices")) || {};
 
 function updateStatusUI(name) {
@@ -34,7 +36,7 @@ function renderDevices() {
       let controlHTML = "";
       if (dev.mode === "dim") {
         controlHTML = `
-          <input type='range' min='0' max='100' value='${dev.dim || 50}' onchange='setDimValue("${name}", this.value)'/>
+          <input type='range' min='0' max='100' value='${dev.dim || 50}' oninput='setDimValue("${name}", this.value)'/>
           <div class="dim-value" id="dim-${name}">${dev.dim || 50}%</div>
         `;
       } else {
@@ -110,12 +112,21 @@ function saveDevices() {
 function toggleTheme() {
   document.body.classList.toggle("dark");
   localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+
+  const popup = document.getElementById("popup");
+  if (document.body.classList.contains("dark")) {
+    popup.classList.add("dark");
+  } else {
+    popup.classList.remove("dark");
+  }
 }
 
 function applySavedTheme() {
   const theme = localStorage.getItem("theme");
   if (theme === "dark") {
     document.body.classList.add("dark");
+    const popup = document.getElementById("popup");
+    popup.classList.add("dark");
   }
 }
 

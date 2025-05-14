@@ -8,28 +8,31 @@
 <body>
   <h1>🏠 Hemautomation</h1>
 
-  <div id="devices-container">
-    <div class="device" id="device-vardagsrum">
-      <h2>Vardagsrum</h2>
-      <p>Status: <span class="status">Okänd</span></p>
-      <button onclick="toggle('Vardagsrum')">Tänd/Släck</button>
-    </div>
-
-    <div class="device" id="device-kok">
-      <h2>Kök</h2>
-      <p>Status: <span class="status">Okänd</span></p>
-      <button onclick="toggle('Kök')">Tänd/Släck</button>
-    </div>
-  </div>
+  <div id="devices-container"></div>
 
   <div class="add-device">
     <button onclick="showAddForm()">➕ Lägg till enhet</button>
-    <div id="add-form" style="display:none; margin-top:1rem;">
-      <input type="text" id="new-device-name" placeholder="Namn på enhet">
-      <button onclick="addDevice()">Spara</button>
-    </div>
   </div>
 
-  <script src="script.js"></script>
-</body>
-</html>
+  <div id="popup" class="popup" style="display:none;">
+    <div class="popup-content">
+      <h2>Ny enhet</h2>
+      <label for="device-type">Typ:</label>
+      <select id="device-type" onchange="updateFormOptions()">
+        <option value="sensor">Givare</option>
+        <option value="lamp">Lampa</option>
+      </select>
+
+      <div id="lamp-options" style="display:none;">
+        <label for="lamp-mode">Lampfunktion:</label>
+        <select id="lamp-mode">
+          <option value="onoff">Tänd/Släck</option>
+          <option value="dim">Dimmringsbar</option>
+        </select>
+      </div>
+
+      <input type="text" id="new-device-name" placeholder="Namn på enhet">
+      <button onclick="addDevice()">Spara</button>
+      <button onclick="closePopup()">Avbryt</button>
+    </div>
+  </div>

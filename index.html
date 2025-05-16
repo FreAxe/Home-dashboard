@@ -3,39 +3,46 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hem</title>
+  <title>Hemautomationspanel</title>
   <link rel="stylesheet" href="style.css" />
-  <style>
-    .device {
-      cursor: move;
-    }
-    .drag-over {
-      outline: 2px dashed var(--primary);
-      background-color: rgba(0, 0, 0, 0.05);
-    }
-    .admin-actions {
-      margin-top: 2rem;
-      text-align: center;
-    }
-  </style>
 </head>
 <body>
-  <h1>Hem</h1>
-
-  <div id="devices-container"></div>
-
-  <div class="admin-actions">
-    <button onclick="removeHiddenDevices()">🧹 Rensa dolda enheter</button>
+  <!-- Meny -->
+  <div id="sidebar" class="sidebar">
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <ul class="menu-list">
+      <li onclick="showView('lighting')">💡 Belysning</li>
+      <li onclick="showView('plants')">🌱 Växtzon</li>
+    </ul>
   </div>
 
-  <div class="add-device">
-    <button onclick="showAddForm()">➕ Lägg till enhet</button>
+  <!-- Innehåll -->
+  <div id="main-content">
+    <h1>Hemautomationspanel</h1>
+
+    <div id="lighting-view" class="dashboard-view">
+      <div id="devices-container"></div>
+
+      <div class="admin-actions">
+        <button onclick="removeHiddenDevices()">🧹 Rensa dolda enheter</button>
+      </div>
+
+      <div class="add-device">
+        <button onclick="showAddForm()">➕ Lägg till enhet</button>
+      </div>
+
+      <div class="toggle-theme">
+        <button onclick="toggleTheme()">🌓 Växla tema</button>
+      </div>
+    </div>
+
+    <div id="plants-view" class="dashboard-view" style="display:none;">
+      <h2>🌿 Växtzonen</h2>
+      <p>Här kommer framtida funktioner för växtskötsel i hemmet.</p>
+    </div>
   </div>
 
-  <div class="toggle-theme">
-    <button onclick="toggleTheme()">🌓 Växla tema</button>
-  </div>
-
+  <!-- Popup för enheter -->
   <div id="popup" class="popup" style="display: none">
     <div class="popup-content">
       <h2>Lägg till enhet</h2>

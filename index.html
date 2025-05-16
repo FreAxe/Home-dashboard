@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Meny -->
+  <!-- Sidomeny -->
   <div id="sidebar" class="sidebar">
     <div class="menu-toggle" onclick="toggleMenu()">☰</div>
     <ul class="menu-list">
@@ -16,10 +16,11 @@
     </ul>
   </div>
 
-  <!-- Innehåll -->
+  <!-- Huvudinnehåll -->
   <div id="main-content">
     <h1>Hemautomationspanel</h1>
 
+    <!-- Belysningsvyn -->
     <div id="lighting-view" class="dashboard-view">
       <div id="devices-container"></div>
 
@@ -36,14 +37,15 @@
       </div>
     </div>
 
+    <!-- Växtzonen -->
     <div id="plants-view" class="dashboard-view" style="display:none;">
       <h2>🌿 Växtzonen</h2>
       <p>Här kommer framtida funktioner för växtskötsel i hemmet.</p>
     </div>
   </div>
 
-  <!-- Popup för enheter -->
-  <div id="popup" class="popup" style="display: none">
+  <!-- Popup för att lägga till enhet -->
+  <div id="popup" class="popup" style="display: none;">
     <div class="popup-content">
       <h2>Lägg till enhet</h2>
 
@@ -71,6 +73,7 @@
     </div>
   </div>
 
+  <!-- JavaScript -->
   <script src="script.js"></script>
 </body>
 </html>

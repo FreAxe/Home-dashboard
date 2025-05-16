@@ -100,12 +100,14 @@ input, select {
   margin-bottom: 0.3rem;
 }
 
-.toggle-theme, .add-device, .admin-actions {
+.toggle-theme,
+.add-device,
+.admin-actions {
   margin: 1rem;
   text-align: center;
 }
 
-/* Sidebar meny */
+/* Sidomeny */
 .sidebar {
   position: fixed;
   top: 0;

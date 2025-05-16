@@ -157,3 +157,37 @@ input, select {
 .sidebar.open + #main-content {
   margin-left: 200px;
 }
+
+.menu-list li {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar:not(.open) .menu-list li {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.device {
+  background: var(--accent);
+  margin: 1rem;
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: move;
+  max-width: 320px;
+  width: calc(100% - 2rem);
+  box-sizing: border-box;
+}
+
+#devices-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-start;
+}
+
+.device {
+  flex: 1 1 300px;
+  max-width: 300px;
+}
+

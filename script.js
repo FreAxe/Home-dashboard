@@ -270,5 +270,14 @@ function removeHiddenDevices() {
   alert(`🧼 Rensade ${hiddenCount} dold(a) enhet(er).`);
 }
 
+function toggleMenu() {
+  document.querySelector('.sidebar').classList.toggle('open');
+}
+
+function showView(view) {
+  document.querySelectorAll('.dashboard-view').forEach(el => el.style.display = 'none');
+  document.getElementById(`${view}-view`).style.display = 'block';
+}
+
 applySavedTheme();
 renderDevices();
